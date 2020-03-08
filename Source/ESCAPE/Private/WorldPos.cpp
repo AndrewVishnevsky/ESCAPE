@@ -35,8 +35,10 @@ void UWorldPos::BeginPlay()
 	//UE_LOG(LogTemp, Log, TEXT("This is a Grey log test message!"));
 	FString ObjName{};
 	ObjName=GetOwner()->GetName();
-
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *ObjName);
+
+	FString ObjectPosition = GetOwner()->GetActorLocation().ToString();
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *ObjectPosition);
 	
 	
 }
