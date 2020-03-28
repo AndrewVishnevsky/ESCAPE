@@ -15,6 +15,29 @@ UOpenDoor::UOpenDoor()
 }
 
 
+
+void UOpenDoor::OpenDoor(float DeltaTime)
+{
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *GetOwner()->GetActorRotation().ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Yaw is : %f"), GetOwner()->GetActorRotation().Yaw);
+
+	CurrentYaw = FMath::FInterpConstantTo(CurrentYaw, TargetYaw, DeltaTime, 45);
+	FRotator DoorRotation = GetOwner()->GetActorRotation();
+	DoorRotation.Yaw = CurrentYaw;
+	GetOwner()->SetActorRotation(DoorRotation);
+
+	//float CurrentYaw = GetOwner()->GetActorRotation().Yaw;
+	//float TargetYaw = {-90.f};
+	//FRotator OpenDoor = { 0.f,TargetYaw,0.f };
+	//OpenDoor.Yaw=FMath::FInterpConstantTo(CurrentYaw, TargetYaw,DeltaTime, 45);
+	//GetOwner()->SetActorRotation(OpenDoor);
+
+	//
+	//FRotator OpenDoorPosition = { 0,OpenAngle,0 };
+	//GetOwner()->SetActorRotation(OpenDoorPosition);
+
+}
+
 // Called when the game starts
 void UOpenDoor::BeginPlay()
 {
@@ -23,11 +46,6 @@ void UOpenDoor::BeginPlay()
 	InitialYaw = GetOwner()->GetActorRotation().Yaw;
 	CurrentYaw = InitialYaw;
 	TargetYaw += InitialYaw;
-
-	
-
-
-	
 	
 }
 
@@ -38,23 +56,12 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 
+	if (PressurePlate->IsOverlappingActor(ActorThatOpen))
+	{
+		OpenDoor(DeltaTime);
+	}
 
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *GetOwner()->GetActorRotation().ToString());
-	UE_LOG(LogTemp, Warning, TEXT("Yaw is : %f"), GetOwner()->GetActorRotation().Yaw);
 
-	CurrentYaw = FMath::FInterpConstantTo(CurrentYaw, TargetYaw, DeltaTime, 45);
-	FRotator DoorRotation = GetOwner()->GetActorRotation();
-	DoorRotation.Yaw = CurrentYaw;
-	GetOwner()->SetActorRotation(DoorRotation);
-	
-	//float CurrentYaw = GetOwner()->GetActorRotation().Yaw;
-	//float TargetYaw = {-90.f};
-	//FRotator OpenDoor = { 0.f,TargetYaw,0.f };
-	//OpenDoor.Yaw=FMath::FInterpConstantTo(CurrentYaw, TargetYaw,DeltaTime, 45);
-	//GetOwner()->SetActorRotation(OpenDoor);
 
-	//
-	//FRotator OpenDoorPosition = { 0,OpenAngle,0 };
-	//GetOwner()->SetActorRotation(OpenDoorPosition);
 }
 
