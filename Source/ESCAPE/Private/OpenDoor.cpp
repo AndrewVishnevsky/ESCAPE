@@ -1,6 +1,8 @@
 // Andrew Vishnevsky 2020
 
 
+#include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
 #include "OpenDoor.h"
 #include "GameFramework/Actor.h"
 
@@ -18,8 +20,8 @@ UOpenDoor::UOpenDoor()
 
 void UOpenDoor::OpenDoor(float DeltaTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *GetOwner()->GetActorRotation().ToString());
-	UE_LOG(LogTemp, Warning, TEXT("Yaw is : %f"), GetOwner()->GetActorRotation().Yaw);
+	//UE_LOG(LogTemp, Warning, TEXT("%s"), *GetOwner()->GetActorRotation().ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("Yaw is : %f"), GetOwner()->GetActorRotation().Yaw);
 
 	CurrentYaw = FMath::FInterpConstantTo(CurrentYaw, TargetYaw, DeltaTime, 45);
 	FRotator DoorRotation = GetOwner()->GetActorRotation();
@@ -38,6 +40,15 @@ void UOpenDoor::OpenDoor(float DeltaTime)
 
 }
 
+void UOpenDoor::CloseDoor(float DeltaTime)
+{
+	CurrentYaw = FMath::FInterpConstantTo(CurrentYaw, InitialYaw, DeltaTime, 45);
+	FRotator DoorRotation = GetOwner()->GetActorRotation();
+	DoorRotation.Yaw = CurrentYaw;
+	GetOwner()->SetActorRotation(DoorRotation);
+}
+
+
 // Called when the game starts
 void UOpenDoor::BeginPlay()
 {
@@ -51,7 +62,8 @@ void UOpenDoor::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("%s has OpenDoor component on it,but no pressureplate set"), *GetOwner()->GetName());
 	}
-	
+
+	ActorThatOpen = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
 
@@ -64,8 +76,17 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	if (PressurePlate && PressurePlate->IsOverlappingActor(ActorThatOpen))
 	{
 		OpenDoor(DeltaTime);
+		DoorLastOpened = GetWorld()->GetTimeSeconds();
+	}
+	else
+	{	
+		//if the door has been open long than DoorClosedDelay
+		if(GetWorld()->GetTimeSeconds()-DoorLastOpened>DoorCloseDelay)
+		CloseDoor(DeltaTime);
 	}
 
+	GetWorld()->GetTimeSeconds();
+	
 
 
 }

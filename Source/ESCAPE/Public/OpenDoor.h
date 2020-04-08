@@ -18,6 +18,7 @@ public:
 	UOpenDoor();
 
 	void OpenDoor(float DeltaTime);
+	void CloseDoor(float DeltaTime);
 
 protected:
 	// Called when the game starts
@@ -41,4 +42,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	AActor* ActorThatOpen;
 		
+	float DoorLastOpened=0.f;
+	float DoorCloseDelay = 2.f;
 };
