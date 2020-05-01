@@ -1,5 +1,6 @@
 // Andrew Vishnevsky 2020
 
+#include "DrawDebugHelpers.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
 #include "GrabberComponent.h"
@@ -42,10 +43,42 @@ void UGrabberComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		OUT PlayerViewPointRotation);
 
 
-	UE_LOG(LogTemp, Warning, TEXT("Location:%s, Rotation:%s"), 
-		*PlayerViewPointLocation.ToString(), 
-		*PlayerViewPointRotation.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("Location:%s, Rotation:%s"), 
+		//*PlayerViewPointLocation.ToString(), 
+		//*PlayerViewPointRotation.ToString());
+	//Draw a line from player showing the reach
+
+	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() *100;
+	
+	DrawDebugLine(
+		GetWorld(),
+		PlayerViewPointLocation,
+		LineTraceEnd,
+		FColor(0, 255, 0),
+		false,
+		0.f,
+		0,
+		5.f
+		);
+
+	FHitResult Hit;
 	//Ray-cast out
+	FCollisionQueryParams TraceParams(FName(TEXT("")),false,GetOwner());
+
+	GetWorld()->LineTraceSingleByObjectType(
+		OUT Hit,
+		PlayerViewPointLocation,
+		LineTraceEnd,
+		FCollisionObjectQueryParams(ECC_PhysicsBody),
+		TraceParams
+	);
+
+	AActor * HitActor= Hit.GetActor();
+	if (HitActor)
+	{ 
+		UE_LOG(LogTemp, Error, TEXT("We are reach %s"), *(HitActor->GetName()));
+	}
+	
 
 	//Check trace line hit
 }
